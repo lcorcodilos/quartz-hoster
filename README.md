@@ -1,3 +1,13 @@
+# Quartz Hoster
+This fork of Quartz v4 contains some basic helpers to get Quartz hosting your content from another machine.
+Run first time setup with `./git_content_setup.sh`. Start the server with `docker compose up -d`.
+
+Push content to the hoster with the following steps:
+- `git init` in your local vault folder
+- Setup the newly made `content.git` folder as a remote repository on your local machine by running `git remote add <origin> user@machine:~/path/to/quartz-hoster/content.git`
+- Ensure ssh keys are setup on `machine` for a smooth experience
+- Commit and push locally as you normally would, with full control over what content makes it to Quartz via your commits
+
 # Quartz v4
 
 > “[One] who works with the door open gets all kinds of interruptions, but [they] also occasionally gets clues as to what the world is and what might be important.” — Richard Hamming
