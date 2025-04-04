@@ -16,8 +16,8 @@ const config: QuartzConfig = {
       provider: "plausible",
     },
     locale: "en-US",
-    baseUrl: "",
-    ignorePatterns: ["private", "templates", ".obsidian", "ipynb", "**/Source", "**/Images"],
+    baseUrl: "localhost",
+    ignorePatterns: ["private", "templates", ".obsidian", "ipynb", "Excalidraw"],
     defaultDateType: "modified",
     theme: {
       fontOrigin: "googleFonts",
