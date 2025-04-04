@@ -37,7 +37,23 @@ export const defaultContentPageLayout: PageLayout = {
         { Component: Component.Darkmode() },
       ],
     }),
-    Component.Explorer(),
+    Component.Explorer({
+      sortFn: (a, b) => {
+        const order = ["Introduction", "Experiments", "Conclusions", "Follow on work", "Code"];
+        const indexA = order.indexOf(a.displayName);
+        const indexB = order.indexOf(b.displayName);
+
+        if (indexA !== -1 && indexB !== -1) {
+          return indexA - indexB;
+        } else if (indexA !== -1) {
+          return -1;
+        } else if (indexB !== -1) {
+          return 1;
+        } else {
+          return a.displayName.localeCompare(b.displayName);
+        }
+      }
+    }),
   ],
   right: [
     Component.Graph(),
