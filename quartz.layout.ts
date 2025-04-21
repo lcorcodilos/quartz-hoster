@@ -15,22 +15,6 @@ export const sharedPageComponents: SharedLayout = {
 }
 
 
-export const explorerSortFn = (a, b) => {
-  const order = ["Introduction", "Experiments", "Conclusions", "Follow on work", "Code"];
-  const indexA = order.indexOf(a.displayName);
-  const indexB = order.indexOf(b.displayName);
-
-  if (indexA !== -1 && indexB !== -1) {
-    return indexA - indexB;
-  } else if (indexA !== -1) {
-    return -1;
-  } else if (indexB !== -1) {
-    return 1;
-  } else {
-    return a.displayName.localeCompare(b.displayName);
-  }
-};
-
 // components for pages that display a single page (e.g. a single note)
 export const defaultContentPageLayout: PageLayout = {
   beforeBody: [
@@ -51,10 +35,9 @@ export const defaultContentPageLayout: PageLayout = {
           Component: Component.Search(),
           grow: true,
         },
-        { Component: Component.Darkmode() },
       ],
     }),
-    Component.Explorer({sortFn: explorerSortFn}),
+    Component.Explorer(),
   ],
   right: [
     Component.Graph(),
@@ -75,10 +58,9 @@ export const defaultListPageLayout: PageLayout = {
           Component: Component.Search(),
           grow: true,
         },
-        { Component: Component.Darkmode() },
       ],
     }),
-    Component.Explorer({sortFn: explorerSortFn}),
+    Component.Explorer(),
   ],
   right: [],
 }
