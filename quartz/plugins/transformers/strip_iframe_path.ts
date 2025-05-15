@@ -7,13 +7,17 @@ import { FilePath, slugifyFilePath } from "../../util/path"
  * Options interface for the StripIFramePaths plugin.
  * Currently, no options are defined, but this is a placeholder for future extensibility.
  */
-interface Options {}
+interface Options {
+    obsidianRoot: string,
+}
 
 /**
  * Default options for the StripIFramePaths plugin.
  * This is an empty object since no options are currently defined.
  */
-const defaultOptions: Options = {}
+const defaultOptions: Options = {
+    obsidianRoot: "",
+}
 
 /**
  * StripIFramePaths Quartz Transformer Plugin
@@ -52,7 +56,8 @@ export const StripIFramePaths: QuartzTransformerPlugin<Partial<Options>> = (user
                             if (node.value.startsWith("<iframe")) {
                                 console.log("[StripIFramePaths] Found <iframe> node:", node.value)
 
-                                node.value = node.value.replace(/src=(["']?)([^"'>\s]+)\1?/, (match: string, _quote: string, absolutePath: string) => {
+                                node.value = node.value.replace(/src=(?:"([^"]+)"|(\S+))\s+/, (match: string, g1: string, g2: string) => {
+                                    const absolutePath = g1 || g2
                                     if (!absolutePath) {
                                         console.error("[StripIFramePaths] Failed to extract src attribute value. Match:", match)
                                         return match // Return the original match if parsing fails
@@ -60,54 +65,19 @@ export const StripIFramePaths: QuartzTransformerPlugin<Partial<Options>> = (user
 
                                     console.log("[StripIFramePaths] Found src attribute with path:", absolutePath)
 
-                                    const normalizedMarkdownPath = path.normalize(markdownFilePath)
-                                    const normalizedIframePath = path.normalize(absolutePath.replace("file://", "")) // Remove the `file://` prefix
+                                    const normalizedIframePath = path.normalize(absolutePath.replace("file://" + opts.obsidianRoot, ""))
 
-                                    const markdownParts = normalizedMarkdownPath.split(path.sep)
-                                    const iframeParts = normalizedIframePath.split(path.sep)
+                                    console.log("[StripIFramePaths] Calculated relative path:", normalizedIframePath)
 
-                                    // Find the first matching segment to identify the shared root
-                                    let sharedRootIndexMarkdown = -1
-                                    let sharedRootIndexIframe = -1
-
-                                    for (let i = 0; i < markdownParts.length; i++) {
-                                        const markdownPart = markdownParts[i]
-                                        const iframeIndex = iframeParts.indexOf(markdownPart)
-                                        if (iframeIndex !== -1) {
-                                            sharedRootIndexMarkdown = i
-                                            sharedRootIndexIframe = iframeIndex
-                                            break
-                                        }
-                                    }
-
-                                    if (sharedRootIndexMarkdown === -1 || sharedRootIndexIframe === -1) {
-                                        console.error("[StripIFramePaths] No shared root directory found.")
-                                        return match // Return the original match if no shared root is found
-                                    }
-
-                                    console.log("[StripIFramePaths] Shared root found at:", markdownParts[sharedRootIndexMarkdown])
-
-                                    // Strip everything before the shared root
-                                    const relativeMarkdownParts = markdownParts.slice(sharedRootIndexMarkdown + 1)
-                                    const relativeIframeParts = iframeParts.slice(sharedRootIndexIframe + 1)
-
-                                    // Calculate the relative path from the Markdown file to the iframe file
-                                    const relativePath = path.join(
-                                        ...Array(relativeMarkdownParts.length).fill(".."), // Go up for each remaining Markdown part
-                                        ...relativeIframeParts // Add the remaining iframe parts
-                                    )
-
-                                    console.log("[StripIFramePaths] Calculated relative path:", relativePath)
-
-                                    const slug = slugifyFilePath(relativePath as FilePath)
+                                    const slug = slugifyFilePath(normalizedIframePath as FilePath)
                                     console.log("[StripIFramePaths] Slugified path:", slug)
 
                                     if (allSlugs.includes(slug)) {
                                         console.log("[StripIFramePaths] Using slugified path:", slug)
                                         return `src="${slug}"`
                                     }
-                                    console.log("[StripIFramePaths] Using relative path:", relativePath)
-                                    return `src="${relativePath}"`
+                                    console.log("[StripIFramePaths] Using relative path:", normalizedIframePath)
+                                    return `src="${normalizedIframePath}"`
                                 })
                             }
                         })
