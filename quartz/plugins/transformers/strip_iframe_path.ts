@@ -57,15 +57,18 @@ export const StripIFramePaths: QuartzTransformerPlugin<Partial<Options>> = (user
                                 console.log("[StripIFramePaths] Found <iframe> node:", node.value)
 
                                 node.value = node.value.replace(/src=(?:"([^"]+)"|(\S+))\s+/, (match: string, g1: string, g2: string) => {
-                                    const absolutePath = g1 || g2
+                                    let absolutePath = g1 || g2
                                     if (!absolutePath) {
                                         console.error("[StripIFramePaths] Failed to extract src attribute value. Match:", match)
                                         return match // Return the original match if parsing fails
                                     }
 
-                                    console.log("[StripIFramePaths] Found src attribute with path:", absolutePath)
+                                    absolutePath = absolutePath.replace("file://", "")
 
-                                    const normalizedIframePath = path.normalize(absolutePath.replace("file://" + opts.obsidianRoot, ""))
+                                    console.log("[StripIFramePaths] Found src attribute with path:", absolutePath)
+                                    console.log("[StripIFramePaths] Obsidian root path:", opts.obsidianRoot)
+
+                                    const normalizedIframePath = path.normalize(absolutePath.replace(opts.obsidianRoot, ""))
 
                                     console.log("[StripIFramePaths] Calculated relative path:", normalizedIframePath)
 
