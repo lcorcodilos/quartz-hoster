@@ -36,18 +36,12 @@ const defaultOptions: Options = {
  */
 export const StripIFramePaths: QuartzTransformerPlugin<Partial<Options>> = (userOpts) => {
     const opts = { ...defaultOptions, ...userOpts }
-    console.log("[StripIFramePaths] Plugin initialized with options:", opts)
-
     return {
         name: "StripIFramePaths",
         markdownPlugins(ctx) {
-            console.log("[StripIFramePaths] markdownPlugins called with context:", ctx)
-
             return [
                 () => {
                     const { allSlugs } = ctx
-                    console.log("[StripIFramePaths] Processing Markdown AST")
-
                     return (tree: any, file: any) => {
                         const markdownFilePath = file.path
                         console.log("[StripIFramePaths] Processing file:", markdownFilePath)
