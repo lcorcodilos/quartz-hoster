@@ -5,9 +5,10 @@ services:
     build:
       context: .
     ports:
-      - "8080:8080"
+      - "3456:3456"
     volumes:
       - ./content:/usr/src/app/content
-    command: ["npx", "quartz", "build", "--serve"]
+      - ./public:/usr/src/app/public
+    command: ["npx", "quartz", "build", "--serve", "--port", "3456"]
 
 
